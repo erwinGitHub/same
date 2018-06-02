@@ -32,18 +32,27 @@ class GraphicalView:
         result = pygame.init()
         self.isInitialized = True
         self.model = model
-        self.level = Label('Level: ' + str(self.model.level))
-        self.text_height =  self.level.text_rect.height
-        self.points = Label('Points: ' + str(self.model.points), 200)
-        self.moves = Label('Moves: ' + str(self.model.moves), 400)
+        self.current_level = self.model.level
             
         self.screen_height = 700
         self.screen_width = 700
+        
+        self.level = Label('Level: ' + str(self.model.level))
+        self.text_height =  self.level.text_rect.height
+        self.points = Label('Points: ' + str(self.model.points))
+        self.moves = Label('Moves: ' + str(self.model.moves))
+                
         self.screen = pygame.display.set_mode((self.screen_width,self.screen_height + self.text_height))
         self.clock = pygame.time.Clock()
-        self.block_width = self.screen_width/model.grid_x 
-        self.block_height = self.screen_height/model.grid_y
-        self.block_rect = pygame.Rect(0, 0, self.block_width-2, self.block_height-2)
+        self.init_view()
+
+    def init_view(self):   
+        self.points.text_rect.centerx = int(self.screen_width/2)
+        self.moves.text_rect.right = self.screen_width
+        
+        self.block_width = self.screen_width/self.model.grid_x 
+        self.block_height = self.screen_height/self.model.grid_y
+        self.block_rect = pygame.Rect(0, 0, self.block_width-5, self.block_height-5)
         self.colors = []
         for x in range(self.model.number_of_colors):
             self.colors.append(self.getRandomColor()) 
@@ -56,7 +65,7 @@ class GraphicalView:
         if event.type == pygame.QUIT:
             self.isInitialized = False
             pygame.quit()
-        elif event.type == pygame.MOUSEBUTTONDOWN and self.model.moves >= 0:
+        elif event.type == pygame.MOUSEBUTTONDOWN and self.model.moves > 0:
             if pygame.mouse.get_pressed()[0]:
                 position = pygame.mouse.get_pos()
                 x = int(position[0] / self.block_width) 
@@ -67,6 +76,10 @@ class GraphicalView:
                 
     def update(self):
         if self.isInitialized:
+            if self.current_level != self.model.level:
+               self.current_level = self.model.level
+               self.init_view()
+                
             self.screen.fill((0,0,0))
             self.level.text = 'Level: ' + str(self.model.level)
             self.points.text = 'Points: ' + str(self.model.points)
@@ -86,11 +99,11 @@ class GraphicalView:
                         col = self.model.grid[(x,y)].color
                         selected = self.model.grid[(x,y)].selected
                         if selected:
-                            self.block_rect.width = self.block_width
-                            self.block_rect.height = self.block_height
+                            self.block_rect.width = self.block_width-1
+                            self.block_rect.height = self.block_height-1
                         else:
-                            self.block_rect.width = self.block_width-2
-                            self.block_rect.height = self.block_height-2
+                            self.block_rect.width = self.block_width-5
+                            self.block_rect.height = self.block_height-5
                             
                         self.block_rect.centerx = x * self.block_width + int(self.block_width/2)
                         self.block_rect.centery = y * self.block_height + int(self.block_height/2) + self.text_height

@@ -18,13 +18,13 @@ class GameEngine:
         self.running = True
         self.level = 1
         self.points = 0
-        self.level_init()
+        self.level_init(self.points)
         
-    def level_init(self):
-        self.grid_x = self.level + 10
-        self.grid_y = self.level + 10
-        self.moves = self.grid_x + self.grid_y
-        self.number_of_colors = int(self.level * 0.3) + 4
+    def level_init(self, p):
+        self.grid_x = self.level + 4
+        self.grid_y = self.level + 4
+        self.moves = self.grid_x + self.grid_y + p
+        self.number_of_colors = int(self.level * 0.2) + 4
         self.grid = {}
         for x in range(self.grid_x):
             for y in range(self.grid_y):
@@ -109,10 +109,8 @@ class GameEngine:
             else:
                 if destination != None:
                     while y >= 0:
-                        dst = destination
-                        self.grid[(dst,y)] = self.grid[(x,y)]
+                        self.grid[(destination,y)] = self.grid[(x,y)]
                         self.grid[(x,y)] = None
-                        dst += 1
                         y -= 1
                     destination += 1
                         
@@ -127,6 +125,6 @@ class GameEngine:
             if self.number_of_blocks <= 0:
                 self.level += 1
                 self.points += self.moves
-                self.level_init()
+                self.level_init(self.moves)
         else:
             self.select_blocks(x,y)
